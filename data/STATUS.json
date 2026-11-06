@@ -3,18 +3,28 @@
   "price_side": "ASK",
   "timezone": "UTC",
   "window_start_utc": "2023-11-06",
-  "checked_at_utc": "2026-11-06T18:11:47Z",
-  "last_h1_open_utc": "2024-02-29T23:00:00Z",
-  "last_d1_date_utc": "2024-02-29",
-  "h1_count": 2784,
-  "d1_count": 116,
+  "checked_at_utc": "2026-11-06T18:49:15Z",
+  "last_h1_open_utc": "2026-11-05T23:00:00Z",
+  "last_d1_date_utc": "2026-11-05",
+  "h1_count": 2929,
+  "d1_count": 152,
   "complete_historical_backfill": false,
-  "completed_month_count": 4,
-  "remaining_month_count": 32,
+  "latest_data_source": "daily_m1_for_current_month_monthly_h1_for_history",
+  "recent_m1_download_successful": true,
+  "last_h1_age_hours": 19.82,
+  "current_hourly_data_fresh": false,
+  "completed_m1_days": [
+    "2026-11-05"
+  ],
+  "failed_m1_days_this_run": [
+    "2026-11-06",
+    "2026-11-02",
+    "2026-11-03"
+  ],
+  "completed_month_count": 6,
+  "remaining_month_count": 30,
   "missing_months": [
     "2024-03",
-    "2024-04",
-    "2024-05",
     "2024-06",
     "2024-07",
     "2024-08",
@@ -46,15 +56,17 @@
     "2026-10"
   ],
   "failed_months_this_run": [
-    "2026-11"
+    "2024-03"
   ],
-  "months_downloaded_this_run": 4,
+  "months_downloaded_this_run": 2,
   "completed_months": [
     "2023-11",
     "2023-12",
     "2024-01",
-    "2024-02"
+    "2024-02",
+    "2024-04",
+    "2024-05"
   ],
-  "note": "Partial historical coverage until missing_months is empty. Last H1 may be stale if Dukascopy has not published current month. D1 is aggregated from available closed H1 UTC candles.",
+  "note": "Historical backfill incomplete while missing_months is nonempty. Recent hours use daily M1 when available; check current_hourly_data_fresh. Flat zero-volume periods omitted; daily UTC buckets aggregate active H1.",
   "source": "https://datafeed.dukascopy.com/datafeed/XAUUSD"
 }
