@@ -3,31 +3,30 @@
   "price_side": "ASK",
   "timezone": "UTC",
   "window_start_utc": "2023-11-06",
-  "checked_at_utc": "2026-11-06T19:55:28Z",
+  "checked_at_utc": "2026-11-06T20:48:46Z",
   "last_h1_open_utc": "2026-11-05T23:00:00Z",
   "last_d1_date_utc": "2026-11-05",
-  "h1_count": 4443,
-  "d1_count": 231,
+  "h1_count": 5940,
+  "d1_count": 311,
   "complete_historical_backfill": false,
   "latest_data_source": "daily_m1_for_current_month_monthly_h1_for_history",
-  "recent_m1_download_successful": false,
-  "last_h1_age_hours": 20.92,
+  "recent_m1_download_successful": true,
+  "last_h1_age_hours": 21.81,
   "current_hourly_data_fresh": false,
   "completed_m1_days": [
+    "2026-11-01",
+    "2026-11-02",
     "2026-11-03",
     "2026-11-05"
   ],
+  "checkpoint_months_requeued": [],
+  "checkpoint_m1_days_requeued": [],
   "failed_m1_days_this_run": [
-    "2026-11-06",
-    "2026-11-05",
-    "2026-11-02"
+    "2026-11-06"
   ],
-  "completed_month_count": 9,
-  "remaining_month_count": 27,
+  "completed_month_count": 12,
+  "remaining_month_count": 24,
   "missing_months": [
-    "2024-03",
-    "2024-09",
-    "2024-10",
     "2024-11",
     "2024-12",
     "2025-01",
@@ -53,21 +52,21 @@
     "2026-09",
     "2026-10"
   ],
-  "failed_months_this_run": [
-    "2024-03",
-    "2024-09"
-  ],
-  "months_downloaded_this_run": 1,
+  "failed_months_this_run": [],
+  "months_downloaded_this_run": 3,
   "completed_months": [
     "2023-11",
     "2023-12",
     "2024-01",
     "2024-02",
+    "2024-03",
     "2024-04",
     "2024-05",
     "2024-06",
     "2024-07",
-    "2024-08"
+    "2024-08",
+    "2024-09",
+    "2024-10"
   ],
   "note": "Historical backfill incomplete while missing_months is nonempty. Recent hours use daily M1 when available; check current_hourly_data_fresh. Flat zero-volume periods omitted; daily UTC buckets aggregate active H1.",
   "source": "https://datafeed.dukascopy.com/datafeed/XAUUSD"
