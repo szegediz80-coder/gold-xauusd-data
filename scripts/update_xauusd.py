@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""XAU/USD ASK H1 + UTC daily summary, three-year rolling data.
+"""XAU/USD ASK H1 and daily UTC aggregation, rolling three years.
 
-Historical H1: Dukascopy monthly hourly candles (resumable batches).
-Current month: Dukascopy daily M1 candles aggregated to closed hours.
-Preserves previous data on server errors; skips nontrading flat candles.
+Archived months: Dukascopy H1 bi5; current month: daily M1 bi5.
+CSV records are authoritative for progress reconciliation; never delete valid
+previously saved hourly bars when replacing a month. Download may be partial
+because a provider file can be unavailable, especially for the current day.
 """
 from __future__ import annotations
 
@@ -28,6 +29,20 @@ PRICE_DIVISOR = 1000
 # One current-month probe + four historical months per run. Avoid bulk throttling.
 BACKFILL_MONTHS_PER_RUN = 3
 CURRENT_MONTH_OLDER_DAYS_PER_RUN = 2
+
+
+def is_sufficient_completed_m1_day(day: date, count: int) -> bool:
+    """Conservative heuristic, not proof of minute-level completeness.
+
+    Saturday normally has no active hours; Sunday often has just a short
+    reopening session. Trading days with fewer than 18 hours should be
+    revisited rather than permanently marked as downloaded.
+    """
+    if day.weekday() == 5:
+        return False
+    if day.weekday() == 6:
+        return count >= 1
+    return count >= 18
 
 
 def three_years_before(day: date) -> date:
@@ -250,20 +265,52 @@ def main():
             status = json.loads(STATUS_FILE.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             print("Existing STATUS.json unreadable; rebuilding progress", flush=True)
-    completed = set(status.get("completed_months", []))
-    completed &= {month_key(y, m) for y, m in months if (y, m) != current}
-
     existing = read_existing()
+    # STATUS.json is only a checkpoint; the CSV is the source of truth.
+    # A previously completed month can disappear from the CSV after a stale
+    # or interrupted workflow commit. Requeue it rather than skipping forever.
+    available_month_counts: dict[str, int] = {}
+    available_day_counts: dict[str, int] = {}
+    for ts in existing:
+        k_month, k_day = ts[:7], ts[:10]
+        available_month_counts[k_month] = available_month_counts.get(k_month, 0) + 1
+        available_day_counts[k_day] = available_day_counts.get(k_day, 0) + 1
+    prior_completed = set(status.get("completed_months", []))
+    valid_old_months = {month_key(y, m) for y, m in months
+                        if (y, m) != current}
+    completed = {m for m in prior_completed & valid_old_months
+                 if available_month_counts.get(m, 0) > 0}
+    lost_months = sorted((prior_completed & valid_old_months) - completed)
+    if lost_months:
+        print(f"WARNING: checkpoint months absent from H1 CSV; "
+              f"queue download: {lost_months}", flush=True)
     missing = [(y, m) for y, m in months if
                (y, m) != current and month_key(y, m) not in completed]
     # For recent data use daily M1 instead of the often unavailable current
     # month's monthly H1 file. Retry today/yesterday every hourly run.
     tracked_days = set(status.get("completed_m1_days", []))
+    # A successful HTTP response is not enough for a "complete day" label:
+    # make sure the actual saved H1 rows still exist and are substantial.
+    verified_days = set()
+    for day_text in tracked_days:
+        try:
+            day_value = date.fromisoformat(day_text)
+        except ValueError:
+            continue
+        if is_sufficient_completed_m1_day(
+                day_value, available_day_counts.get(day_text, 0)):
+            verified_days.add(day_text)
+    lost_days = sorted(tracked_days - verified_days)
+    if lost_days:
+        print(f"WARNING: checkpoint M1 days incomplete or absent from H1 CSV; "
+              f"queue retry: {lost_days}", flush=True)
+    tracked_days = verified_days
     current_month_start = now.date().replace(day=1)
     older_days = []
     cursor = current_month_start
     while cursor < now.date() - timedelta(days=1):
-        if cursor.isoformat() not in tracked_days and cursor.weekday() < 5:
+        # Sunday trading resumes for a short session; Saturday stays closed.
+        if cursor.isoformat() not in tracked_days and cursor.weekday() != 5:
             older_days.append(cursor)
         cursor += timedelta(days=1)
     priority = [now.date(), now.date() - timedelta(days=1)]
@@ -282,7 +329,13 @@ def main():
             # hours if the upstream day file is temporarily incomplete.
             existing.update(replacement)
         if day < now.date():
-            tracked_days.add(day.isoformat())
+            # Do not permanently skip a partially published daily M1 file.
+            actual_count = sum(ts.startswith(day.isoformat()) for ts in existing)
+            if is_sufficient_completed_m1_day(day, actual_count):
+                tracked_days.add(day.isoformat())
+            else:
+                print(f"WARNING: {day} only {actual_count} active H1 bars; "
+                      "retry on a later run", flush=True)
         time.sleep(1)
 
     # Fill old months gradually; do not re-request completed months.
@@ -302,8 +355,8 @@ def main():
         if not replacement:
             failed.append(month_key(year, month))
             continue
-        prefix = f"{year}-{month:02d}-"
-        existing = {k: v for k, v in existing.items() if not k.startswith(prefix)}
+        # Merge instead of deleting prior month rows. A provider response
+        # containing only part of a month must not erase older archived bars.
         existing.update(replacement)
         completed.add(month_key(year, month))
         successful += 1
@@ -343,6 +396,8 @@ def main():
              .replace(tzinfo=timezone.utc)).total_seconds() <= 3 * 3600),
         "completed_m1_days": sorted(d for d in tracked_days if
                                      d.startswith(now.strftime("%Y-%m"))),
+        "checkpoint_months_requeued": lost_months,
+        "checkpoint_m1_days_requeued": lost_days,
         "failed_m1_days_this_run": failed_days,
         "completed_month_count": len(completed),
         "remaining_month_count": len(remaining),
