@@ -3,7 +3,7 @@
   "price_side": "ASK",
   "timezone": "UTC",
   "window_start_utc": "2023-11-10",
-  "checked_at_utc": "2026-11-10T05:58:23Z",
+  "checked_at_utc": "2026-11-10T07:14:30Z",
   "last_h1_open_utc": "2026-11-09T23:00:00Z",
   "last_d1_date_utc": "2026-11-09",
   "h1_count": 17716,
@@ -11,7 +11,7 @@
   "complete_historical_backfill": true,
   "latest_data_source": "daily_m1_for_current_month_monthly_h1_for_history",
   "recent_m1_download_successful": false,
-  "last_h1_age_hours": 6.97,
+  "last_h1_age_hours": 8.24,
   "current_hourly_data_fresh": false,
   "completed_m1_days": [
     "2026-11-01",
