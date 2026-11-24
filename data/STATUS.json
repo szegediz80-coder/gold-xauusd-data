@@ -2,17 +2,17 @@
   "instrument": "XAU/USD",
   "price_side": "ASK",
   "timezone": "UTC",
-  "window_start_utc": "2023-11-23",
-  "checked_at_utc": "2026-11-23T23:56:21Z",
-  "last_h1_open_utc": "2026-11-22T23:00:00Z",
-  "last_d1_date_utc": "2026-11-22",
-  "h1_count": 17716,
+  "window_start_utc": "2023-11-24",
+  "checked_at_utc": "2026-11-24T01:17:28Z",
+  "last_h1_open_utc": "2026-11-23T23:00:00Z",
+  "last_d1_date_utc": "2026-11-23",
+  "h1_count": 17719,
   "d1_count": 934,
   "complete_historical_backfill": true,
   "latest_data_source": "daily_m1_for_current_month_monthly_h1_for_history",
   "recent_m1_download_successful": true,
-  "last_h1_age_hours": 24.94,
-  "current_hourly_data_fresh": false,
+  "last_h1_age_hours": 2.29,
+  "current_hourly_data_fresh": true,
   "completed_m1_days": [
     "2026-11-01",
     "2026-11-02",
@@ -32,12 +32,13 @@
     "2026-11-18",
     "2026-11-19",
     "2026-11-20",
-    "2026-11-22"
+    "2026-11-22",
+    "2026-11-23"
   ],
   "checkpoint_months_requeued": [],
   "checkpoint_m1_days_requeued": [],
   "failed_m1_days_this_run": [
-    "2026-11-23"
+    "2026-11-24"
   ],
   "completed_month_count": 36,
   "remaining_month_count": 0,
